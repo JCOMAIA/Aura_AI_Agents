@@ -227,7 +227,7 @@ Contributions are welcome! If you'd like to improve AuraCode, please follow thes
 
 ## 📄 License
 
-This project is released under a custom license designed to be free for small-scale use. 
+This project is Open Source. 
 
 - If you need help find me on : discord https://discord.gg/Urb27E9C
 
