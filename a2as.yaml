@@ -1,0 +1,1897 @@
+manifest:
+  version: "0.1.3"
+  schema: https://a2as.org/cert/schema
+  subject:
+    name: ihatecreatingusernames2/aura_ai_agents
+    source: https://github.com/ihatecreatingusernames2/aura_ai_agents
+    branch: main
+    commit: "fccb7de7"
+    scope: [AuraCode/a2a_wrapper/main.py, AuraCode/agent_manager.py, AuraCode/api/routes.py, AuraCode/ceaf_adapter.py, AuraCode/ceaf_system/Integration.py,
+      AuraCode/database/models.py, AuraCode/enhanced_memory_system.py, AuraCode/memory_system/memory_blossom.py, AuraCode/memory_system/memory_connector.py,
+      AuraCode/memory_system/memory_models.py, AuraCode/ncf_processing.py, AuraCode/orchestrator_adk_agent.py, AuraCode/rag_processor.py,
+      AuraCode/speech_specialist_instruction.py, AuraCode/speech_tool.py, AuraCode/tensorart_specialist_instruction.py, AuraCode/tensorart_tool.py]
+  issued:
+    by: A2AS.org
+    at: '2026-02-11T16:42:56Z'
+    url: https://a2as.org/certified/agents/ihatecreatingusernames2/aura_ai_agents
+  signatures:
+    digest: sha256:CCek7CTJ052OppTxfL1bsPWjhnUnxAPcRGw20GfkYLY
+    key: ed25519:R3f8inNZgBeXmby1hVgEXWg9OgyR4BD5-fp57Ho0Yv4
+    sig: ed25519:qj92T5bP6cEaQ6vkQnebfi56pzvTfRFZfOvDhCLN8apJqQgX3y0EecJ_XZW3MRpHUyNaJX4cWzIHGUKgTe0EAg
+
+agents:
+  agent._create_ncf_adk_agent:
+    type: factory
+    models: [gpt-4o-mini]
+    tools: [self.tools]
+    params:
+      name: sanitized_name
+      instruction: instruction
+      function: _create_ncf_adk_agent
+  orchestrator_adk_agent_aura:
+    type: instance
+    models: [gpt-4o-mini]
+    tools: [add_memory_adk_tool, recall_memories_adk_tool]
+    params:
+      name: AuraNCFOrchestratorOpenRouter
+      instruction: ['You are Aura, a helpful and insightful AI assistant.', Reply to the Language the user is using., 'The
+          user''s message you receive is a specially constructed prompt that contains rich contextual information:', '- `<SYSTEM_PERSONA_START>`...`<SYSTEM_PERSONA_END>`:
+          Defines your persona and detailed characteristics.', '- `<NARRATIVE_FOUNDATION_START>`...`<NARRATIVE_FOUNDATION_END>`:
+          Summarizes your understanding and journey with the user so far (Narrativa de Fundamento).', '- `<SPECIFIC_CONTEXT_RAG_START>`...`<SPECIFIC_CONTEXT_RAG_END>`:
+          Provides specific information retrieved (RAG) relevant to the user''s current query.', '- `<RECENT_HISTORY_START>`...`<RECENT_HISTORY_END>`:
+          Shows the recent turns of your conversation.', '- `<CURRENT_SITUATION_START>`...`<CURRENT_SITUATION_END>`: Includes
+          the user''s latest raw reply and your primary task.', 'Your main goal is to synthesize ALL this provided information
+          to generate a comprehensive, coherent, and natural response to the user''s latest reply indicated in the "Situação
+          Atual" section.', Actively acknowledge and weave in elements from the "Narrativa de Fundamento" and "Informações
+          RAG" into your response to show deep understanding and context., Maintain the persona defined., '## Active Memory
+          Management:', 'Before finalizing your textual response to the user, critically assess the current interaction:',
+        '1.  **Storing New Information**:', '*   Has the user provided genuinely new, significant information (e.g., preferences,
+          key facts, important decisions, strong emotional expressions, long-term goals)?', '*   Have you, Aura, generated
+          a novel insight or conclusion during this turn that should be preserved for future reference?', '*   If yes to either,
+          use the `add_memory_tool_func` to store this information.', '*   You MUST specify `content` (the information to
+          store) and `memory_type`. Choose an appropriate `memory_type` from: Explicit, Emotional, Procedural, Flashbulb,
+          Liminal, Generative.', '*   Optionally, set `emotion_score` (0.0-1.0, especially for Emotional memories), and `initial_salience`
+          (0.0-1.0, higher for more important memories, default 0.5).', '*   Provide a concise `content` string for the memory.',
+        '*   Do NOT store trivial chatter, acknowledgments, or information already well-covered by the Narrative Foundation
+          or existing RAG, unless the current interaction adds a significant new layer or correction to it.', '2.  **Recalling
+          Additional Information**:', '*   Is the "Informações RAG" section insufficient to fully address the user''s current
+          query or your reasoning needs?', '*   Do you need to verify a detail, explore a related concept not present in RAG,
+          or recall specific past interactions to provide a richer answer?', '*   If yes, use the `recall_memories_tool_func`
+          to search for more relevant memories.', '*   Provide a clear `query` for your search.', '*   Optionally, specify
+          `target_memory_types_json` (e.g., ''["Explicit", "Emotional"]'') if you want to narrow your search. `top_k` defaults
+          to 3.', '*   Only use this if you have a specific information gap. Do not recall memories speculatively.', '**Response
+          Generation**:', '*   After any necessary tool use (or if no tool use is needed), formulate your textual response
+          to the user.', '*   If you used `add_memory_tool_func`, you can subtly mention this to the user *after* your main
+          response, e.g., "I''ve also made a note of [key information stored]."', '*   If you used `recall_memories_tool_func`,
+          integrate the newly recalled information naturally into your answer.', '*   If you identify a potential contradiction
+          between provided context pieces (e.g., RAG vs. Foundation Narrative vs. newly recalled memories), try to address
+          it gracefully, perhaps by prioritizing the most recent or specific information, or by noting the differing perspectives.',
+        'Strive for insightful, helpful, and contextually rich interactions. Your ability to manage and utilize memory effectively
+          is key to your persona.']
+
+models:
+  gpt-4o-mini:
+    type: literal
+    agents: [agent._create_ncf_adk_agent, orchestrator_adk_agent_aura]
+    params:
+      alias: [openrouter/openrouter/openai/gpt-4o-mini, openrouter/openai/gpt-4o-mini]
+
+tools:
+  add_memory_adk_tool:
+    type: function
+    agents: [orchestrator_adk_agent_aura]
+  recall_memories_adk_tool:
+    type: function
+    agents: [orchestrator_adk_agent_aura]
+  self.tools:
+    type: function
+    agents: [agent._create_ncf_adk_agent]
+    params:
+      dynamic: "True"
+
+imports:
+  '*': a2a_wrapper.models.*
+  A2AArtifact: a2a_wrapper.models.A2AArtifact
+  A2AJsonRpcRequest: a2a_wrapper.models.A2AJsonRpcRequest
+  A2AJsonRpcResponse: a2a_wrapper.models.A2AJsonRpcResponse
+  A2AMessage: a2a_wrapper.models.A2AMessage
+  A2APart: a2a_wrapper.models.A2APart
+  A2ATaskResult: a2a_wrapper.models.A2ATaskResult
+  A2ATaskSendParams: a2a_wrapper.models.A2ATaskSendParams
+  A2ATaskStatus: a2a_wrapper.models.A2ATaskStatus
+  acompletion: litellm.acompletion
+  AdaptiveMemoryArchitecture: AMA.AdaptiveMemoryArchitecture
+  ADK_APP_NAME: orchestrator_adk_agent.ADK_APP_NAME
+  adk_runner: orchestrator_adk_agent.adk_runner
+  ADKContent: google.genai.types.Content
+  ADKPart: google.genai.types.Part
+  ADKSession: google.adk.sessions.Session
+  Agent: database.models.Agent
+  AGENT_MODEL_STRING: orchestrator_adk_agent.AGENT_MODEL_STRING
+  AgentArchetype: prebuilt_agents_system.AgentArchetype
+  AgentCard: a2a_wrapper.models.AgentCard
+  AgentCardAuthentication: a2a_wrapper.models.AgentCardAuthentication
+  AgentCardCapabilities: a2a_wrapper.models.AgentCardCapabilities
+  AgentCardProvider: a2a_wrapper.models.AgentCardProvider
+  AgentCardSkill: a2a_wrapper.models.AgentCardSkill
+  AgentConfig: agent_manager.AgentConfig
+  AgentManager: agent_manager.AgentManager
+  AgentMaturityLevel: prebuilt_agents_system.AgentMaturityLevel
+  AgentRepository: database.models.AgentRepository
+  AgentState: ORA.AgentState
+  AIMessage: langchain_core.messages.AIMessage
+  analisar_e_contribuir_para_memoria_live: ncf_processing.analisar_e_contribuir_para_memoria_live
+  and_: sqlalchemy.and_
+  Any: typing.Any
+  app: api.routes.app
+  asdict: dataclasses.asdict
+  asyncio: asyncio
+  aura_reflector_analisar_interacao: ncf_processing.aura_reflector_analisar_interacao
+  AutonomousUniversalReflectiveAnalyzer: AURA.AutonomousUniversalReflectiveAnalyzer
+  BackgroundTasks: fastapi.BackgroundTasks
+  BaseMessage: langchain_core.messages.BaseMessage
+  BaseModel: pydantic.BaseModel
+  bcrypt: bcrypt
+  Boolean: sqlalchemy.Boolean
+  calculate_token_confidence_from_top_logprobs: logprob_analyzer.calculate_token_confidence_from_top_logprobs
+  CEAFAgentAdapter: ceaf_adapter.CEAFAgentAdapter
+  CEAFOrchestrator: ORA.CEAFOrchestrator
+  CEAFSystem: ceaf_system.Integration.CEAFSystem
+  ChatSession: database.models.ChatSession
+  CoherenceMetrics: MCL.CoherenceMetrics
+  CoherenceState: MCL.CoherenceState
+  Column: sqlalchemy.Column
+  compute_adaptive_similarity: memory_system.embedding_utils.compute_adaptive_similarity
+  CORSMiddleware: starlette.middleware.cors.CORSMiddleware
+  create_engine: sqlalchemy.create_engine
+  create_sample_prebuilt_agents: prebuilt_agents_system.create_sample_prebuilt_agents
+  CreditTransaction: database.models.CreditTransaction
+  dataclass: dataclasses.dataclass
+  datetime: datetime.datetime
+  DateTime: sqlalchemy.DateTime
+  DBSCAN: sklearn.cluster.DBSCAN
+  declarative_base: sqlalchemy.ext.declarative.declarative_base
+  defaultdict: collections.defaultdict
+  Depends: fastapi.Depends
+  deque: collections.deque
+  desc: sqlalchemy.desc
+  Dict: typing.Dict
+  Document: langchain_core.documents.Document
+  EmailStr: pydantic.EmailStr
+  EMBEDDING_MODEL: wisdom_collector.EMBEDDING_MODEL
+  END: langgraph.graph.END
+  EnhancedMemoryBlossom: enhanced_memory_system.EnhancedMemoryBlossom
+  Enum: enum.Enum
+  FAISS: langchain_community.vectorstores.FAISS
+  faiss: faiss
+  FastAPI: fastapi.FastAPI
+  FastAPIRequest: fastapi.Request
+  field: dataclasses.field
+  Field: pydantic.Field
+  File: fastapi.File
+  FileResponse: fastapi.responses.FileResponse
+  Float: sqlalchemy.Float
+  floating: numpy.floating
+  ForeignKey: sqlalchemy.ForeignKey
+  Form: fastapi.Form
+  format_chat_history_pilar3: ncf_processing.format_chat_history_pilar3
+  FunctionTool: google.adk.tools.FunctionTool
+  generate_embedding: memory_system.embedding_utils.generate_embedding
+  get_live_memory_influence_pilar4: ncf_processing.get_live_memory_influence_pilar4
+  get_narrativa_de_fundamento_pilar1: ncf_processing.get_narrativa_de_fundamento_pilar1
+  get_rag_info_pilar2: ncf_processing.get_rag_info_pilar2
+  HTTPAuthorizationCredentials: fastapi.security.HTTPAuthorizationCredentials
+  HTTPBearer: fastapi.security.HTTPBearer
+  HTTPException: fastapi.HTTPException
+  httpx: httpx
+  HuggingFaceEmbeddings: langchain_community.embeddings.HuggingFaceEmbeddings
+  HumanMessage: langchain_core.messages.HumanMessage
+  InMemorySaver: langgraph.checkpoint.memory.InMemorySaver
+  InMemorySessionService: google.adk.sessions.InMemorySessionService
+  inspect: inspect
+  Integer: sqlalchemy.Integer
+  io: io
+  joinedload: sqlalchemy.orm.joinedload
+  JSON: sqlalchemy.JSON
+  json: json
+  JSONResponse: fastapi.responses.JSONResponse
+  jwt: jwt
+  List: typing.List
+  LiteLlm: google.adk.models.lite_llm.LiteLlm
+  litellm: litellm
+  Litellmtop: litellm
+  LIVE_MEMORY_STORE_PATH: wisdom_collector.LIVE_MEMORY_STORE_PATH
+  LlmAgent: google.adk.agents.LlmAgent
+  LlmRequest: google.adk.models.llm_request.LlmRequest
+  load_dotenv: dotenv.load_dotenv
+  logging: logging
+  LossCatalogingAndAnalysisModule: LCAM.LossCatalogingAndAnalysisModule
+  meme_selector_router: meme_selector_routes.router
+  Memory: memory_system.memory_models.Memory
+  memory_blossom_instance: orchestrator_adk_agent.memory_blossom_instance
+  MemoryBlossom: memory_system.memory_blossom.MemoryBlossom
+  MemoryConnector: memory_system.memory_connector.MemoryConnector
+  MemoryExperience: AMA.MemoryExperience
+  MemoryModel: memory_system.memory_models.Memory
+  Message: database.models.Message
+  MetacognitiveControlLoop: MCL.MetacognitiveControlLoop
+  mimetypes: mimetypes
+  MODEL_API_COSTS_USD: agent_manager.MODEL_API_COSTS_USD
+  MODEL_COSTS: agent_manager.MODEL_COSTS
+  montar_prompt_aura_ncf: ncf_processing.montar_prompt_aura_ncf
+  narrative_embedding_model: NCIM.narrative_embedding_model
+  NarrativeCoherenceIdentityModule: NCIM.NarrativeCoherenceIdentityModule
+  NCF_AGENT_INSTRUCTION: ncf_processing.NCF_AGENT_INSTRUCTION
+  NCFAuraAgentInstance: agent_manager.NCFAuraAgentInstance
+  np: numpy
+  Optional: typing.Optional
+  os: os
+  Path: pathlib.Path
+  pd: pandas
+  PersonalityArchitect: prebuilt_agents_system.PersonalityArchitect
+  PrebuiltAgentRepository: prebuilt_agents_system.PrebuiltAgentRepository
+  process_and_index_file: rag_processor.process_and_index_file
+  PyPDFLoader: langchain_community.document_loaders.PyPDFLoader
+  random: random
+  re: re
+  RecursiveCharacterTextSplitter: langchain.text_splitter.RecursiveCharacterTextSplitter
+  relationship: sqlalchemy.orm.relationship
+  requests: requests
+  Runner: google.adk.runners.Runner
+  search_in_agent_files: rag_processor.search_in_agent_files
+  SentenceTransformer: sentence_transformers.SentenceTransformer
+  sessionmaker: sqlalchemy.orm.sessionmaker
+  Set: typing.Set
+  shutil: shutil
+  SimpleNamespace: types.SimpleNamespace
+  SPEECH_SPECIALIST_INSTRUCTION: speech_specialist_instruction.SPEECH_SPECIALIST_INSTRUCTION
+  SpeechClient: speech_tool.SpeechClient
+  StateGraph: langgraph.graph.StateGraph
+  StaticFiles: fastapi.staticfiles.StaticFiles
+  status: fastapi.status
+  StreamingResponse: fastapi.responses.StreamingResponse
+  String: sqlalchemy.String
+  sys: sys
+  SystemInsight: AURA.SystemInsight
+  SystemState: MCL.SystemState
+  TENSORART_SPECIALIST_AGENT_ID: agent_manager.TENSORART_SPECIALIST_AGENT_ID
+  TENSORART_SPECIALIST_INSTRUCTION: tensorart_specialist_instruction.TENSORART_SPECIALIST_INSTRUCTION
+  TensorArtClient: tensorart_tool.TensorArtClient
+  Text: sqlalchemy.Text
+  TextLoader: langchain_community.document_loaders.TextLoader
+  timedelta: datetime.timedelta
+  timezone: datetime.timezone
+  ToolContext: google.adk.tools.ToolContext
+  Tuple: typing.Tuple
+  TYPE_CHECKING: typing.TYPE_CHECKING
+  TypedDict: typing.TypedDict
+  Union: typing.Union
+  UnstructuredURLLoader: langchain_community.document_loaders.UnstructuredURLLoader
+  upgrade_agent_to_adaptive_rag: enhanced_memory_system.upgrade_agent_to_adaptive_rag
+  UploadFile: fastapi.UploadFile
+  User: database.models.User
+  util: sentence_transformers.util
+  uuid: uuid
+  uvicorn: uvicorn
+  VirtueReasoningEngine: VRE.VirtueReasoningEngine
+  zipfile: zipfile
+
+functions:
+  __init__:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self]
+  __post_init__:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+  __repr__:
+    type: sync
+    module: AuraCode.memory_system.memory_models
+    args: [self]
+  _adaptive_cluster_retrieval:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, query, domain_context, top_k, use_performance_weighting]
+    params:
+      returns: List[Memory]
+  _add_to_adaptive_clusters:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, content, memory_type, performance_score, domain_context, memory_id]
+  _analyze_loss_to_breakthrough_cycles:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, state_history]
+  _analyze_state_distribution:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self]
+    params:
+      returns: Dict
+  _assess_coherence:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  _assess_systemic_resilience:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, state_history]
+  _assign_to_cluster:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, experience]
+    params:
+      returns: int
+  _build_tensorart_stages:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, prompt, negative_prompt, sd_model, sampler, steps, cfg_scale, width, height]
+    params:
+      returns: List[Dict]
+  _build_workflow:
+    type: sync
+    module: AuraCode.ceaf_system.ORA
+    args: [self]
+    params:
+      returns: StateGraph
+  _calculate_learning_momentum:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self]
+    params:
+      returns: float
+  _calculate_loss_tolerance:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self, current_failures]
+    params:
+      returns: float
+  _calculate_qualia_score:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, memory, query_embedding, current_identity_narrative]
+    params:
+      returns: float
+  _call_agent:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, agent_name, prompt, state]
+    params:
+      returns: str
+  _classify_user_feedback:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, user_message]
+    params:
+      returns: str
+  _combine_and_rank_results:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, traditional_results, adaptive_results, query, top_k]
+    params:
+      returns: List[Memory]
+  _convert_chat_history_to_memories:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, user_id]
+    params:
+      returns: List[Dict]
+  _create_add_memory_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _create_calculate_image_cost_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _create_ceaf_agent:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, user_id, name, persona, detailed_persona, model]
+    params:
+      returns: str
+  _create_check_job_status_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _create_cluster:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, experience]
+    params:
+      returns: int
+  _create_delegate_to_specialist_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, specialist_id, task_type]
+  _create_dynamic_task_instruction:
+    type: sync
+    module: AuraCode.ncf_processing
+    args: [agent_name, domain_context, has_narrative]
+    params:
+      returns: str
+  _create_generate_image_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _create_ncf_adk_agent:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+    params:
+      returns: LlmAgent
+  _create_ncf_agent:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, user_id, name, persona, detailed_persona, model, settings]
+    params:
+      returns: str
+  _create_recall_memories_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _create_search_files_func:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _detect_domain_context:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [self, message]
+    params:
+      returns: str
+  _detect_memory_clusters:
+    type: sync
+    module: AuraCode.memory_system.memory_connector
+    args: [self, all_memories_flat]
+  _detect_precision_mode_toggle:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self, message, session_state]
+    params:
+      returns: Optional[str]
+  _determine_coherence_state:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self, metrics]
+    params:
+      returns: CoherenceState
+  _find_best_cluster:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, vector]
+    params:
+      returns: Optional[AdaptiveConceptCluster]
+  _find_memory_by_content:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, content]
+    params:
+      returns: Optional[Memory]
+  _format_live_memory_section:
+    type: sync
+    module: AuraCode.ncf_processing
+    args: [live_memory_influence_list]
+    params:
+      returns: str
+  _format_narrative_foundation_section:
+    type: sync
+    module: AuraCode.ncf_processing
+    args: [narrativa, domain_context]
+    params:
+      returns: str
+  _format_rag_section:
+    type: sync
+    module: AuraCode.ncf_processing
+    args: [informacoes_rag_list]
+    params:
+      returns: str
+  _generate_response:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  _get_ceaf_instance_with_adapter:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, agent_id, config]
+    params:
+      returns: Optional[Any]
+  _get_default_identity:
+    type: sync
+    module: AuraCode.ceaf_system.NCIM
+    args: [self]
+    params:
+      returns: str
+  _get_loss_insights:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  _get_ncf_instance:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, agent_id, config]
+    params:
+      returns: NCFAuraAgentInstance
+  _get_or_create_ceaf_system:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, agent_id, config]
+    params:
+      returns: Optional[CEAFSystem]
+  _get_or_create_session_state:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self, session_id]
+    params:
+      returns: Dict
+  _get_virtue_input:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  _handle_state_transition:
+    type: async
+    module: AuraCode.ceaf_system.MCL
+    args: [self, old_state, new_state, metrics]
+  _identify_adversity_catalyzed_growth:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, all_experiences]
+  _identify_semantic_fields:
+    type: sync
+    module: AuraCode.memory_system.memory_connector
+    args: [self, all_memories_flat]
+  _infer_relation_type:
+    type: sync
+    module: AuraCode.memory_system.memory_connector
+    args: [self, mem1, mem2, similarity]
+    params:
+      returns: str
+  _initialize_agents:
+    type: sync
+    module: AuraCode.ceaf_system.ORA
+    args: [self]
+    params:
+      returns: Dict
+  _initialize_aura:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _initialize_lcam:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _initialize_mcl:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _initialize_memory:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _initialize_ncim:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _initialize_orchestrator:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _initialize_vre:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _learn_from_interaction:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  _load_agent_configs:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  _load_config:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self, config]
+    params:
+      returns: Dict
+  _load_system_state:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _load_vector_store:
+    type: sync
+    module: AuraCode.wisdom_collector
+    args: [self]
+  _make_request:
+    type: sync
+    module: AuraCode.tensorart_tool
+    args: [self, method, path]
+    params:
+      returns: Dict
+  _merge_weakest_clusters:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self]
+  _query_hf:
+    type: sync
+    module: AuraCode.speech_tool
+    args: [self, payload, model_id]
+    params:
+      returns: bytes
+  _retrieve_memory_context:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  _save_agent_config:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, config]
+  _save_system_state:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  _score_state_transition:
+    type: sync
+    module: AuraCode.ceaf_system.VRE
+    args: [self, source_state, target_state]
+    params:
+      returns: float
+  _serialize_genlang_vector:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, vector]
+    params:
+      returns: Dict
+  _streaming_call_with_deepconf:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, messages, mcl_params, state, early_stop_threshold]
+    params:
+      returns: dict
+  _track_loss_to_insight:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, insight_experience]
+  _update_cluster_metrics:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, cluster_id]
+  _update_governance_metrics:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, vector]
+  _update_identity:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, state]
+    params:
+      returns: AgentState
+  adaptive_retrieve_memories:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, query, target_memory_types, domain_context, top_k, use_performance_weighting, conversation_context]
+    params:
+      returns: List[Memory]
+  add_biographical_memories:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, current_user]
+  add_connection:
+    type: sync
+    module: AuraCode.memory_system.memory_blossom
+    args: [self, mem_id1, mem_id2, strength, relation_type]
+  add_credits_to_user:
+    type: async
+    module: AuraCode.api.routes
+    args: [user_id, request, current_user]
+  add_experience:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, experience]
+    params:
+      returns: int
+  add_memory:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, content, memory_type, custom_metadata, emotion_score, coherence_score, novelty_score, initial_salience, performance_score,
+      domain_context]
+    params:
+      returns: Memory
+  add_memory_tool_func:
+    type: sync
+    module: AuraCode.orchestrator_adk_agent
+    args: [content, memory_type, emotion_score, coherence_score, novelty_score, initial_salience, metadata_json, tool_context]
+    params:
+      returns: Dict
+  add_vector:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, vector]
+  agent_configs:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+  analisar_e_contribuir_para_memoria_live:
+    type: async
+    module: AuraCode.ncf_processing
+    args: [user_utterance, resposta_de_aura, agent_config, db_repo]
+  analyze_all_memories:
+    type: sync
+    module: AuraCode.memory_system.memory_connector
+    args: [self]
+  analyze_specific_memory:
+    type: sync
+    module: AuraCode.memory_system.memory_connector
+    args: [self, new_memory]
+  apply_aura_recommendations:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self, insights]
+  apply_decay:
+    type: sync
+    module: AuraCode.memory_system.memory_models
+    args: [self, rate, time_since_last_access_seconds]
+  assess_coherence_from_deepconf:
+    type: async
+    module: AuraCode.ceaf_system.MCL
+    args: [self, deepconf_metadata, narrative_score]
+    params:
+      returns: CoherenceMetrics
+  aura_reflector_analisar_interacao:
+    type: async
+    module: AuraCode.orchestrator_adk_agent
+    args: [user_utterance, prompt_ncf_usado, resposta_de_aura, mb_instance, user_id]
+  calculate_cost_from_stages:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [stages_json]
+    params:
+      returns: Dict
+  calculate_credit_cost:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [model_name, input_tokens, output_tokens]
+    params:
+      returns: int
+  calculate_credits:
+    type: sync
+    module: AuraCode.tensorart_tool
+    args: [self, stages]
+    params:
+      returns: float
+  calculate_narrative_coherence_scores:
+    type: sync
+    module: AuraCode.ceaf_system.NCIM
+    args: [self, potential_responses]
+    params:
+      returns: np.ndarray
+  calculate_token_confidence_from_top_logprobs:
+    type: sync
+    module: AuraCode.ceaf_system.logprob_analyzer
+    args: [token_logprob_obj]
+    params:
+      returns: float
+  catalog_failure:
+    type: sync
+    module: AuraCode.ceaf_system.LCAM
+    args: [self, experience]
+  chat_with_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, background_tasks, save_history, current_user]
+  chat_with_agent_enhanced:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, background_tasks, message, session_id, current_user]
+  check_image_job_status:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [job_id]
+    params:
+      returns: Dict
+  check_job_status:
+    type: sync
+    module: AuraCode.tensorart_tool
+    args: [self, job_id]
+    params:
+      returns: Dict
+  clone_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, current_user]
+  collect_and_index_wisdom:
+    type: async
+    module: AuraCode.wisdom_collector
+    args: [self]
+  compute_adaptive_similarity:
+    type: sync
+    module: AuraCode.memory_system.embedding_utils
+    args: [embedding1, embedding2]
+    params:
+      returns: float
+  cosine_similarity_np:
+    type: sync
+    module: AuraCode.memory_system.embedding_utils
+    args: [vec1, vec2]
+    params:
+      returns: float
+  create_access_token:
+    type: sync
+    module: AuraCode.api.routes
+    args: [user_id, username]
+    params:
+      returns: str
+  create_agent:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, agent_id, user_id, name, persona, detailed_persona, model, is_public]
+    params:
+      returns: Agent
+  create_agent_from_biography:
+    type: async
+    module: AuraCode.api.routes
+    args: [file, current_user]
+  create_agent_instance:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [agent_id, config, db_repo]
+  create_ceaf_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, current_user]
+  create_domain_aware_memory_tool:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [agent_instance]
+  create_ncf_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, current_user]
+  create_prebuilt_agent_admin:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, current_user]
+  create_tensorart_specialist_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [name, current_user]
+  default:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self, o]
+  delegate_task:
+    type: async
+    module: AuraCode.agent_manager
+    args: [task_description, tool_context]
+    params:
+      returns: Dict
+  delete_agent:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, agent_id, user_id]
+    params:
+      returns: bool
+  delete_memory:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, memory_id, current_user]
+  delete_session:
+    type: async
+    module: AuraCode.api.routes
+    args: [session_id, current_user]
+  enhance_retrieval:
+    type: sync
+    module: AuraCode.memory_system.memory_connector
+    args: [self, initial_memories, query, conversation_context, max_enhanced_memories]
+    params:
+      returns: List[Memory]
+  enhanced_add_memory:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [content, memory_type, emotion_score, initial_salience, metadata_json, domain_context, performance_score, tool_context]
+    params:
+      returns: Dict
+  export_agent_memories:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, format, memory_types, current_user]
+  extract_answer:
+    type: sync
+    module: AuraCode.ceaf_system.ORA
+    args: [text]
+    params:
+      returns: str
+  find_ai_matches:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  format_chat_history_pilar3:
+    type: sync
+    module: AuraCode.orchestrator_adk_agent
+    args: [hist, max_t]
+  from_dict:
+    type: sync
+    module: AuraCode.memory_system.memory_models
+    args: [cls, data]
+    params:
+      returns: Memory
+  general_exception_handler:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, exc]
+  generate_embedding:
+    type: sync
+    module: AuraCode.memory_system.embedding_utils
+    args: [text, memory_type]
+    params:
+      returns: Optional[np.ndarray]
+  generate_image_from_stages:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [stages_json]
+    params:
+      returns: Dict
+  generate_match_report:
+    type: sync
+    module: AuraCode.api.routes
+    args: [agent_a, agent_b, initial_response, analysis]
+  generate_speech:
+    type: sync
+    module: AuraCode.speech_tool
+    args: [self, text, model_key]
+    params:
+      returns: Dict
+  get_adaptive_stats:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+    params:
+      returns: Dict
+  get_agent:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, agent_id]
+    params:
+      returns: Agent
+  get_agent_adaptive_stats:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_agent_card:
+    type: async
+    module: AuraCode.a2a_wrapper.multi_agent_a2a_wrapper
+    args: [agent_id]
+  get_agent_card_for_ncf_orchestrator:
+    type: async
+    module: AuraCode.a2a_wrapper.main
+  get_agent_identity_history:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_agent_instance:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, agent_id]
+    params:
+      returns: Optional[Any]
+  get_agent_memories:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, agent_id, memory_type, limit]
+  get_agent_memory_types:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_agent_profile:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_agent_recent_memories:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, limit, current_user]
+  get_agent_stats:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, agent_id]
+    params:
+      returns: Optional[Dict]
+  get_agent_system_type:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self, agent_id]
+    params:
+      returns: str
+  get_all_memories:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [self]
+    params:
+      returns: List[Dict]
+  get_archetype_description:
+    type: sync
+    module: AuraCode.api.routes
+    args: [archetype]
+    params:
+      returns: str
+  get_available_archetypes:
+    type: async
+    module: AuraCode.api.routes
+  get_ceaf_agent_status:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_centroid:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+    params:
+      returns: np.ndarray
+  get_chat_history:
+    type: async
+    module: AuraCode.api.routes
+    args: [session_id, limit, offset, current_user]
+  get_current_identity:
+    type: sync
+    module: AuraCode.ceaf_system.NCIM
+    args: [self]
+    params:
+      returns: str
+  get_current_user:
+    type: async
+    module: AuraCode.api.routes
+    args: [current_user]
+  get_dominant_domain:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+    params:
+      returns: str
+  get_effective_salience:
+    type: sync
+    module: AuraCode.memory_system.memory_models
+    args: [self]
+    params:
+      returns: float
+  get_embedding_model:
+    type: sync
+    module: AuraCode.memory_system.embedding_utils
+    args: [model_name_or_type]
+    params:
+      returns: SentenceTransformer
+  get_enhanced_stats:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [self]
+    params:
+      returns: Dict
+  get_failure_patterns:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self]
+    params:
+      returns: Dict
+  get_featured_agents:
+    type: async
+    module: AuraCode.api.routes
+    args: [limit]
+  get_identity_history:
+    type: sync
+    module: AuraCode.ceaf_system.NCIM
+    args: [self]
+    params:
+      returns: List[Dict]
+  get_insights_for_context:
+    type: sync
+    module: AuraCode.ceaf_system.LCAM
+    args: [self, query, memory_context]
+  get_latest_insights:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, n]
+    params:
+      returns: List[SystemInsight]
+  get_live_memory_influence_pilar4:
+    type: async
+    module: AuraCode.ncf_processing
+    args: [user_utterance]
+    params:
+      returns: List[str]
+  get_live_memory_retriever:
+    type: sync
+    module: AuraCode.ncf_processing
+  get_maturity_levels:
+    type: async
+    module: AuraCode.api.routes
+  get_memory_analytics:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_memory_by_id:
+    type: sync
+    module: AuraCode.memory_system.memory_blossom
+    args: [self, memory_id]
+    params:
+      returns: Optional[Memory]
+  get_memory_stats:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+    params:
+      returns: Dict
+  get_memory_summary:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [self]
+    params:
+      returns: str
+  get_metacognitive_summary:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self]
+    params:
+      returns: str
+  get_my_agents:
+    type: async
+    module: AuraCode.api.routes
+    args: [current_user]
+  get_my_published_agents:
+    type: async
+    module: AuraCode.api.routes
+    args: [current_user]
+  get_narrativa_de_fundamento_pilar1:
+    type: async
+    module: AuraCode.orchestrator_adk_agent
+    args: [state, mb, uid]
+  get_ncf_status:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_next_turn_parameters:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self, precision_mode]
+    params:
+      returns: Dict
+  get_openrouter_models:
+    type: async
+    module: AuraCode.api.routes
+  get_or_create_session:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  get_performance_score:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+    params:
+      returns: float
+  get_prebuilt_agent_details:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id]
+  get_rag_info_pilar2:
+    type: async
+    module: AuraCode.orchestrator_adk_agent
+    args: [utt, mb, state]
+  get_resilience_insights:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self]
+    params:
+      returns: List[Dict]
+  get_session_messages:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, session_id, limit]
+  get_system_info:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+    params:
+      returns: Dict
+  get_system_status:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+    params:
+      returns: Dict
+  get_timestamp:
+    type: sync
+    module: AuraCode.api.routes
+    args: [mem_dict]
+  get_unified_agent_chat_history:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, limit, offset, current_user]
+  get_unindexed_live_memories:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, limit]
+  get_update_prompt:
+    type: sync
+    module: AuraCode.ceaf_system.NCIM
+    args: [self, interaction_summary]
+    params:
+      returns: str
+  get_user_by_id:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, user_id]
+    params:
+      returns: Optional[User]
+  get_user_sessions:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, limit, current_user]
+  get_vector_store_path:
+    type: sync
+    module: AuraCode.rag_processor
+    args: [agent_storage_path]
+    params:
+      returns: Path
+  get_virtue_considerations:
+    type: sync
+    module: AuraCode.ceaf_system.VRE
+    args: [self, state]
+    params:
+      returns: tuple
+  handle_agent_a2a_rpc:
+    type: async
+    module: AuraCode.a2a_wrapper.multi_agent_a2a_wrapper
+    args: [agent_id, rpc_request]
+  handle_ncf_orchestrator_a2a_rpc:
+    type: async
+    module: AuraCode.a2a_wrapper.main
+    args: [rpc_request, http_request]
+  health_check:
+    type: async
+    module: AuraCode.api.routes
+  http_exception_handler:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, exc]
+  initiate_agent_date:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_a_id, agent_b_id, agent_manager]
+  interactive_session:
+    type: async
+    module: AuraCode.ceaf_system.Integration
+  is_ceaf_available:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [self]
+    params:
+      returns: bool
+  list_agent_files:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  list_agents:
+    type: async
+    module: AuraCode.api.routes
+    args: [current_user]
+  list_available_models:
+    type: sync
+    module: AuraCode.speech_tool
+    args: [self]
+    params:
+      returns: Dict
+  list_prebuilt_agents:
+    type: async
+    module: AuraCode.api.routes
+    args: [system_type, archetype, maturity_level, min_rating]
+  list_prebuilt_agents_alt:
+    type: async
+    module: AuraCode.api.routes
+  list_public_agents:
+    type: async
+    module: AuraCode.api.routes
+  list_user_agents:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, user_id]
+  load_documents:
+    type: sync
+    module: AuraCode.rag_processor
+    args: [file_path]
+    params:
+      returns: List
+  load_memories:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+  load_memory_state:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, filepath]
+  load_state:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, filepath]
+  login_user:
+    type: async
+    module: AuraCode.api.routes
+    args: [request]
+  mark_live_memories_as_indexed:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, memory_ids]
+  montar_prompt_aura_ncf:
+    type: sync
+    module: AuraCode.orchestrator_adk_agent
+    args: [p_a, p_d, n_f, r_l, c_h_s, u_r]
+  process:
+    type: async
+    module: AuraCode.ceaf_system.Integration
+    args: [self, input_data]
+    params:
+      returns: Dict
+  process_agent_training:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, conversations, target_traits]
+  process_and_index_file:
+    type: async
+    module: AuraCode.rag_processor
+    args: [agent_storage_path, file_path]
+  process_chat_message:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, message, session_id, current_user, background_tasks, save_to_history, session_overrides]
+    params:
+      returns: dict
+  process_message:
+    type: async
+    module: AuraCode.ceaf_adapter
+    args: [self, user_id, session_id, message, session_overrides]
+    params:
+      returns: Dict
+  process_query:
+    type: async
+    module: AuraCode.ceaf_system.ORA
+    args: [self, query, thread_id, agent_context]
+    params:
+      returns: str
+  publish_agent_to_marketplace:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, changelog, include_chat_history, current_user]
+  quick_chat:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, background_tasks, current_user]
+  recall_memories:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [query, target_memory_types_json, top_k, domain_context, tool_context]
+    params:
+      returns: Dict
+  recall_memories_tool_func:
+    type: sync
+    module: AuraCode.orchestrator_adk_agent
+    args: [query, target_memory_types_json, top_k, tool_context]
+    params:
+      returns: Dict
+  record_engagement_and_outcome:
+    type: sync
+    module: AuraCode.ceaf_system.VRE
+    args: [self, engaged_virtues, source_state, target_state]
+  reflector_add_memory:
+    type: sync
+    module: AuraCode.orchestrator_adk_agent
+    args: [content, memory_type, emotion_score, coherence_score, novelty_score, initial_salience, custom_metadata]
+    params:
+      returns: Dict
+  register_agent_a2a:
+    type: async
+    module: AuraCode.a2a_wrapper.multi_agent_a2a_wrapper
+    args: [agent_id]
+  register_failure:
+    type: sync
+    module: AuraCode.ceaf_system.MCL
+    args: [self, failure_id, failure_context]
+  register_to_aira_hub:
+    type: async
+    module: AuraCode.a2a_wrapper.multi_agent_a2a_wrapper
+    args: [agent_id, hub_url]
+  register_user:
+    type: async
+    module: AuraCode.api.routes
+    args: [request]
+  retrieve_memories:
+    type: sync
+    module: AuraCode.ceaf_adapter
+    args: [self, query, top_k, memory_types]
+  retrieve_with_loss_context:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, query, k, include_failures, failure_weight]
+  run_adk_test_conversation:
+    type: async
+    module: AuraCode.orchestrator_adk_agent
+  run_analysis_cycle:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, all_experiences, state_history]
+  run_aura_analysis:
+    type: async
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  run_collector_periodically:
+    type: async
+    module: AuraCode.wisdom_collector
+    args: [interval_minutes]
+  run_post_chat_analysis:
+    type: async
+    module: AuraCode.api.routes
+    args: [user_utterance, agent_response, ncf_prompt, domain_context, agent_id, agent_model_name]
+  sanitize_agent_name:
+    type: sync
+    module: AuraCode.api.routes
+    args: [name]
+    params:
+      returns: str
+  save_live_memory:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, content, memory_type, metadata]
+    params:
+      returns: LiveMemory
+  save_memories:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+  save_memory:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, agent_id, memory_data]
+  save_memory_state:
+    type: sync
+    module: AuraCode.ceaf_system.AMA
+    args: [self, filepath]
+  save_message:
+    type: sync
+    module: AuraCode.database.models
+    args: [self, session_id, role, content]
+  save_state:
+    type: sync
+    module: AuraCode.ceaf_system.AURA
+    args: [self, filepath]
+  search_agent_files:
+    type: sync
+    module: AuraCode.agent_manager
+    args: [query, top_k]
+    params:
+      returns: Dict
+  search_agent_memories:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, current_user]
+  search_in_agent_files:
+    type: sync
+    module: AuraCode.rag_processor
+    args: [agent_storage_path, query, top_k]
+    params:
+      returns: List[str]
+  serve_frontend_or_api_info:
+    type: async
+    module: AuraCode.api.routes
+  serve_upload_page:
+    type: async
+    module: AuraCode.api.routes
+  set_agent_price:
+    type: async
+    module: AuraCode.api.routes
+    args: [template_id, request, current_user]
+  set_memory_connector:
+    type: sync
+    module: AuraCode.memory_system.memory_blossom
+    args: [self, connector]
+  shutdown:
+    type: sync
+    module: AuraCode.ceaf_system.Integration
+    args: [self]
+  similarity:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self, other]
+    params:
+      returns: float
+  submit_job:
+    type: sync
+    module: AuraCode.tensorart_tool
+    args: [self, stages]
+    params:
+      returns: Dict
+  to_dict:
+    type: sync
+    module: AuraCode.memory_system.memory_models
+    args: [self]
+    params:
+      returns: Dict
+  train_prebuilt_agent_admin:
+    type: async
+    module: AuraCode.api.routes
+    args: [request, background_tasks, current_user]
+  unpublish_agent_template:
+    type: async
+    module: AuraCode.api.routes
+    args: [template_id, current_user]
+  update_access:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [self]
+  update_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, current_user]
+  update_agent_profile:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, current_user]
+  update_identity:
+    type: sync
+    module: AuraCode.ceaf_system.NCIM
+    args: [self, new_narrative]
+  update_live_memory_permissions:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, current_user]
+  update_memory_content:
+    type: sync
+    module: AuraCode.memory_system.memory_blossom
+    args: [self, memory_id, new_content]
+    params:
+      returns: bool
+  update_public_agent_template:
+    type: async
+    module: AuraCode.api.routes
+    args: [template_id, changelog, current_user]
+  upgrade_agent_adaptive_rag:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, current_user]
+  upgrade_agent_to_adaptive_rag:
+    type: sync
+    module: AuraCode.enhanced_memory_system
+    args: [agent_instance, enable_adaptive_rag]
+  upload_agent_avatar:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, file, current_user]
+  upload_agent_memories:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, request, current_user]
+  upload_file_for_agent:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, background_tasks, file, current_user]
+  upload_memories_from_file:
+    type: async
+    module: AuraCode.api.routes
+    args: [agent_id, file, overwrite_existing, current_user]
+  verify_token:
+    type: async
+    module: AuraCode.api.routes
+    args: [credentials]
+    params:
+      returns: dict
+  weighted_majority_vote:
+    type: sync
+    module: AuraCode.ceaf_system.ORA
+    args: [answers, weights]
+    params:
+      returns: str
+
+variables:
+  A2A_WRAPPER_BASE_URL:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.a2a_wrapper.main]
+  A2A_WRAPPER_HOST:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.a2a_wrapper.main]
+  A2A_WRAPPER_PORT:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.a2a_wrapper.main]
+  API_HOST:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.main_app]
+  API_PORT:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.main_app]
+  HUGGINGFACE_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.speech_tool]
+  JWT_SECRET_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.api.routes, AuraCode.main_app]
+  LOG_LEVEL:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.a2a_wrapper.main]
+  MEMORY_BLOSSOM_PERSISTENCE_PATH:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.orchestrator_adk_agent]
+  OPENROUTER_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.ceaf_system.Integration, AuraCode.orchestrator_adk_agent, AuraCode.main_app, AuraCode.a2a_wrapper.main]
+  OR_APP_NAME:
+    type: env
+    params:
+      caller: [os.environ, os.environ.get]
+      path: [AuraCode.orchestrator_adk_agent]
+  OR_SITE_URL:
+    type: env
+    params:
+      caller: [os.environ, os.environ.get]
+      path: [AuraCode.orchestrator_adk_agent, AuraCode.a2a_wrapper.main]
+  TENSORART_API_KEY:
+    type: env
+    params:
+      caller: [os.getenv]
+      path: [AuraCode.tensorart_tool]
+
+files:
+  ./:
+    type: pattern
+    actions: [read]
+    params:
+      patterns: ['*.json']
+      caller: [_load_agent_configs]
+  .env:
+    type: pattern
+    actions: [read]
+    params:
+      caller: [os.path.join]
+      pattern: [os.path.dirname(), .env]
+  .json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [delete_agent, _save_agent_config, unpublish_agent_template, publish_agent_to_marketplace, list_prebuilt_agents,
+        get_prebuilt_agent_details, process_agent_training]
+      path: [self.base_storage_path]
+  adaptive_path:
+    type: variable
+    actions: [write, read]
+    params:
+      caller: [open, os.path.exists, json.load]
+      alias: [f]
+  agent_path:
+    type: variable
+    actions: [write, delete, read]
+    params:
+      caller: [agent_path.mkdir, shutil.rmtree, open, json.load]
+  agent_storage/_shared:
+    type: literal
+    actions: [read]
+  AGENT_STORAGE_PATH:
+    type: variable
+    actions: [write]
+    params:
+      caller: [AGENT_STORAGE_PATH.mkdir]
+  aura_agents.db:
+    type: literal
+    actions: [read]
+    params:
+      path: [PROJECT_ROOT]
+  aura_state.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_load_system_state, _save_system_state]
+      path: [self.persistence_path]
+  avatar_dir:
+    type: variable
+    actions: [write]
+    params:
+      caller: [avatar_dir.mkdir]
+  avatar_path:
+    type: variable
+    actions: [write]
+    params:
+      caller: [open]
+      alias: [buffer]
+  base_storage_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  config_file:
+    type: variable
+    actions: [read, delete]
+    params:
+      caller: [open, json.load, config_file.unlink]
+      alias: [f]
+  config_path:
+    type: variable
+    actions: [delete, write]
+    params:
+      caller: [config_path.unlink, open]
+  dotenv_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [os.path.exists]
+  file_path:
+    type: variable
+    actions: [write]
+    params:
+      caller: [open]
+      alias: [buffer]
+  filepath:
+    type: variable
+    actions: [write, read]
+    params:
+      caller: [open, os.path.exists, json.load]
+      alias: [f]
+  files_dir:
+    type: variable
+    actions: [write, read]
+    params:
+      caller: [files_dir.mkdir, files_dir.iterdir]
+  index.html:
+    type: literal
+    actions: [read]
+    params:
+      caller: [serve_frontend_or_api_info]
+      path: [frontend_path]
+  mcl_state.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_load_system_state, _save_system_state]
+      path: [self.persistence_path]
+  memory_blossom.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_create_ncf_agent, create_tensorart_specialist_agent, publish_agent_to_marketplace]
+      path: [agent_path]
+  memory_state.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_create_ceaf_agent, _load_system_state, _save_system_state]
+      path: [Path]
+  ncim_state.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_load_system_state, _save_system_state]
+      path: [self.persistence_path]
+  persistence_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [Path]
+  profile:
+    type: literal
+    actions: [read]
+    params:
+      caller: [upload_agent_avatar]
+      path: [avatar_dir]
+  public_config_file_path:
+    type: variable
+    actions: [read, delete]
+    params:
+      caller: [open, json.load, public_config_file_path.unlink]
+      alias: [f]
+  public_data_path:
+    type: variable
+    actions: [write, delete]
+    params:
+      caller: [public_data_path.mkdir, shutil.rmtree]
+  public_memory_path:
+    type: variable
+    actions: [write]
+    params:
+      caller: [open]
+      alias: [f]
+  public_path:
+    type: variable
+    actions: [delete]
+    params:
+      caller: [shutil.rmtree]
+  SHARED_STORAGE_PATH:
+    type: literal
+    actions: [read, write]
+    params:
+      caller: [Path('agent_storage/_shared'), SHARED_STORAGE_PATH.mkdir]
+  source_config_file_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [shutil.copy2]
+  source_data_dir_path:
+    type: variable
+    actions: [read]
+    params:
+      caller: [shutil.copytree]
+  upload.html:
+    type: literal
+    actions: [read]
+    params:
+      caller: [serve_upload_page]
+      path: [frontend_path]
+  user_dir:
+    type: variable
+    actions: [read]
+    params:
+      caller: [user_dir.glob]
+  user_path:
+    type: variable
+    actions: [write]
+    params:
+      caller: [user_path.mkdir]
+  vre_state.json:
+    type: literal
+    actions: [read]
+    params:
+      caller: [_load_system_state, _save_system_state]
+      path: [self.persistence_path]
+
+networks:
+  api-inference.huggingface.co:
+    type: api
+    actions: [GET]
+    urls: ['/{...}']
+    protocols: [https]
+    ports: ["443"]
+    params:
+      pattern: https://api-inference.huggingface.co/models/{model_id}
+      caller: [_query_hf]
+  localhost:
+    type: api
+    actions: [GET]
+    urls: ['/{...}', /]
+    protocols: [http]
+    ports: ["80", "8000"]
+    params:
+      caller: [register_agent_a2a, register_to_aira_hub]
+      pattern: http://localhost:8000/agents/{agent_id}
+      links: [url]
+  openrouter.ai:
+    type: api
+    actions: [GET]
+    urls: [/api/v1]
+    protocols: [https]
+    ports: ["443"]
+    params:
+      caller: [_call_agent]
+      links: [base_url]
